@@ -1,0 +1,472 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Queue Implementation
+
+ 
+struct QNode {
+    int data;
+    struct QNode* next;
+};
+
+ 
+struct Queue {
+    struct QNode* front;
+    struct QNode* rear;
+};
+
+ 
+struct QNode* createQNode(int data) {
+    struct QNode* newNode = (struct QNode*)malloc(sizeof(struct QNode));
+    if (!newNode) {
+        printf("Memory allocation error\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Initialize Queue
+struct Queue* createQueue() {
+    struct Queue* q = (struct Queue*)malloc(sizeof(struct Queue));
+    if (!q) {
+        printf("Memory allocation error\n");
+        exit(1);
+    }
+    q->front = q->rear = NULL;
+    return q;
+}
+
+// Enqueue operation for Queue
+void enqueue(struct Queue* q, int data) {
+    struct QNode* temp = createQNode(data);
+    if (q->rear == NULL) {
+        q->front = q->rear = temp;
+        printf("%d enqueued to Queue\n", data);
+        return;
+    }
+    q->rear->next = temp;
+    q->rear = temp;
+    printf("%d enqueued to Queue\n", data);
+}
+
+// Dequeue operation for Queue
+int dequeue(struct Queue* q) {
+    if (q->front == NULL) {
+        printf("Queue Underflow\n");
+        return -1;
+    }
+    struct QNode* temp = q->front;
+    int data = temp->data;
+    q->front = q->front->next;
+
+    if (q->front == NULL)
+        q->rear = NULL;
+
+    free(temp);
+    return data;
+}
+
+// Peek operation for Queue
+int peekQueue(struct Queue* q) {
+    if (q->front == NULL) {
+        printf("Queue is empty\n");
+        return -1;
+    }
+    return q->front->data;
+}
+
+// Display Queue
+void displayQueue(struct Queue* q) {
+    if (q->front == NULL) {
+        printf("Queue is empty\n");
+        return;
+    }
+    struct QNode* temp = q->front;
+    printf("Queue elements: ");
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+//  Circular Queue Implementation  
+
+struct CQueue {
+    struct QNode* last;
+};
+
+// Initialize Circular Queue
+struct CQueue* createCQueue() {
+    struct CQueue* cq = (struct CQueue*)malloc(sizeof(struct CQueue));
+    if (!cq) {
+        printf("Memory allocation error\n");
+        exit(1);
+    }
+    cq->last = NULL;
+    return cq;
+}
+
+// Enqueue operation for Circular Queue
+void enqueueCQueue(struct CQueue* cq, int data) {
+    struct QNode* temp = createQNode(data);
+    if (cq->last == NULL) {
+        temp->next = temp; // Point to itself
+        cq->last = temp;
+        printf("%d enqueued to Circular Queue\n", data);
+        return;
+    }
+    temp->next = cq->last->next;
+    cq->last->next = temp;
+    cq->last = temp;
+    printf("%d enqueued to Circular Queue\n", data);
+}
+
+// Dequeue operation for Circular Queue
+int dequeueCQueue(struct CQueue* cq) {
+    if (cq->last == NULL) {
+        printf("Circular Queue Underflow\n");
+        return -1;
+    }
+
+    struct QNode* first = cq->last->next;
+    int data = first->data;
+
+    if (cq->last == first) {
+        cq->last = NULL;
+    } else {
+        cq->last->next = first->next;
+    }
+
+    free(first);
+    return data;
+}
+
+// Peek operation for Circular Queue
+int peekCQueue(struct CQueue* cq) {
+    if (cq->last == NULL) {
+        printf("Circular Queue is empty\n");
+        return -1;
+    }
+    return cq->last->next->data;
+}
+
+// Display Circular Queue
+void displayCQueue(struct CQueue* cq) {
+    if (cq->last == NULL) {
+        printf("Circular Queue is empty\n");
+        return;
+    }
+    struct QNode* temp = cq->last->next;
+    printf("Circular Queue elements: ");
+    do {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    } while (temp != cq->last->next);
+    printf("\n");
+}
+
+//  Deque Implementation  
+
+struct DNode {
+    int data;
+    struct DNode* next;
+    struct DNode* prev;
+};
+
+ 
+struct Deque {
+    struct DNode* front;
+    struct DNode* rear;
+};
+
+// Function to create a new DNode
+struct DNode* createDNode(int data) {
+    struct DNode* newNode = (struct DNode*)malloc(sizeof(struct DNode));
+    if (!newNode) {
+        printf("Memory allocation error\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->next = newNode->prev = NULL;
+    return newNode;
+}
+
+// Initialize Deque
+struct Deque* createDeque() {
+    struct Deque* dq = (struct Deque*)malloc(sizeof(struct Deque));
+    if (!dq) {
+        printf("Memory allocation error\n");
+        exit(1);
+    }
+    dq->front = dq->rear = NULL;
+    return dq;
+}
+
+// Insert at front of Deque
+void insertFront(struct Deque* dq, int data) {
+    struct DNode* temp = createDNode(data);
+    if (dq->front == NULL) {
+        dq->front = dq->rear = temp;
+    } else {
+        temp->next = dq->front;
+        dq->front->prev = temp;
+        dq->front = temp;
+    }
+    printf("%d inserted at front of Deque\n", data);
+}
+
+// Insert at rear of Deque
+void insertRear(struct Deque* dq, int data) {
+    struct DNode* temp = createDNode(data);
+    if (dq->rear == NULL) {
+        dq->front = dq->rear = temp;
+    } else {
+        temp->prev = dq->rear;
+        dq->rear->next = temp;
+        dq->rear = temp;
+    }
+    printf("%d inserted at rear of Deque\n", data);
+}
+
+// Delete from front of Deque
+int deleteFront(struct Deque* dq) {
+    if (dq->front == NULL) {
+        printf("Deque Underflow\n");
+        return -1;
+    }
+    struct DNode* temp = dq->front;
+    int data = temp->data;
+    dq->front = dq->front->next;
+    if (dq->front == NULL)
+        dq->rear = NULL;
+    else
+        dq->front->prev = NULL;
+    free(temp);
+    return data;
+}
+
+// Delete from rear of Deque
+int deleteRear(struct Deque* dq) {
+    if (dq->rear == NULL) {
+        printf("Deque Underflow\n");
+        return -1;
+    }
+    struct DNode* temp = dq->rear;
+    int data = temp->data;
+    dq->rear = dq->rear->prev;
+    if (dq->rear == NULL)
+        dq->front = NULL;
+    else
+        dq->rear->next = NULL;
+    free(temp);
+    return data;
+}
+
+// Peek front of Deque
+int peekFront(struct Deque* dq) {
+    if (dq->front == NULL) {
+        printf("Deque is empty\n");
+        return -1;
+    }
+    return dq->front->data;
+}
+
+// Peek rear of Deque
+int peekRear(struct Deque* dq) {
+    if (dq->rear == NULL) {
+        printf("Deque is empty\n");
+        return -1;
+    }
+    return dq->rear->data;
+}
+
+// Display Deque
+void displayDeque(struct Deque* dq) {
+    if (dq->front == NULL) {
+        printf("Deque is empty\n");
+        return;
+    }
+    struct DNode* temp = dq->front;
+    printf("Deque elements: ");
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+//Main Menu 
+
+int main() {
+    int mainChoice;
+    struct Queue* q = createQueue();
+    struct CQueue* cq = createCQueue();
+    struct Deque* dq = createDeque();
+
+    while (1) {
+        printf("\nData Structures Menu\n");
+        printf("1. Queue\n");
+        printf("2. Circular Queue\n");
+        printf("3. Deque\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &mainChoice);
+
+        switch (mainChoice) {
+            case 1: { // Queue Operations
+                int qChoice, value;
+                while (1) {
+                    printf("\n--- Queue Operations ---\n");
+                    printf("1. Enqueue\n");
+                    printf("2. Dequeue\n");
+                    printf("3. Peek\n");
+                    printf("4. Display\n");
+                    printf("5. Back to Main Menu\n");
+                    printf("Enter your choice: ");
+                    scanf("%d", &qChoice);
+
+                    switch (qChoice) {
+                        case 1:
+                            printf("Enter value to enqueue: ");
+                            scanf("%d", &value);
+                            enqueue(q, value);
+                            break;
+                        case 2:
+                            value = dequeue(q);
+                            if (value != -1)
+                                printf("Dequeued value: %d\n", value);
+                            break;
+                        case 3:
+                            value = peekQueue(q);
+                            if (value != -1)
+                                printf("Front value: %d\n", value);
+                            break;
+                        case 4:
+                            displayQueue(q);
+                            break;
+                        case 5:
+                            goto endQueue; // Exit Queue operations
+                        default:
+                            printf("Invalid choice. Please try again.\n");
+                    }
+                }
+                endQueue:
+                break;
+            }
+
+            case 2: { // Circular Queue Operations
+                int cqChoice, value;
+                while (1) {
+                    printf("\n--- Circular Queue Operations ---\n");
+                    printf("1. Enqueue\n");
+                    printf("2. Dequeue\n");
+                    printf("3. Peek\n");
+                    printf("4. Display\n");
+                    printf("5. Back to Main Menu\n");
+                    printf("Enter your choice: ");
+                    scanf("%d", &cqChoice);
+
+                    switch (cqChoice) {
+                        case 1:
+                            printf("Enter value to enqueue: ");
+                            scanf("%d", &value);
+                            enqueueCQueue(cq, value);
+                            break;
+                        case 2:
+                            value = dequeueCQueue(cq);
+                            if (value != -1)
+                                printf("Dequeued value: %d\n", value);
+                            break;
+                        case 3:
+                            value = peekCQueue(cq);
+                            if (value != -1)
+                                printf("Front value: %d\n", value);
+                            break;
+                        case 4:
+                            displayCQueue(cq);
+                            break;
+                        case 5:
+                            goto endCQueue; // Exit Circular Queue operations
+                        default:
+                            printf("Invalid choice. Please try again.\n");
+                    }
+                }
+                endCQueue:
+                break;
+            }
+
+            case 3: { // Deque Operations
+                int dqChoice, value;
+                while (1) {
+                    printf("\n--- Deque Operations ---\n");
+                    printf("1. Insert Front\n");
+                    printf("2. Insert Rear\n");
+                    printf("3. Delete Front\n");
+                    printf("4. Delete Rear\n");
+                    printf("5. Peek Front\n");
+                    printf("6. Peek Rear\n");
+                    printf("7. Display\n");
+                    printf("8. Back to Main Menu\n");
+                    printf("Enter your choice: ");
+                    scanf("%d", &dqChoice);
+
+                    switch (dqChoice) {
+                        case 1:
+                            printf("Enter value to insert at front: ");
+                            scanf("%d", &value);
+                            insertFront(dq, value);
+                            break;
+                        case 2:
+                            printf("Enter value to insert at rear: ");
+                            scanf("%d", &value);
+                            insertRear(dq, value);
+                            break;
+                        case 3:
+                            value = deleteFront(dq);
+                            if (value != -1)
+                                printf("Deleted front value: %d\n", value);
+                            break;
+                        case 4:
+                            value = deleteRear(dq);
+                            if (value != -1)
+                                printf("Deleted rear value: %d\n", value);
+                            break;
+                        case 5:
+                            value = peekFront(dq);
+                            if (value != -1)
+                                printf("Front value: %d\n", value);
+                            break;
+                        case 6:
+                            value = peekRear(dq);
+                            if (value != -1)
+                                printf("Rear value: %d\n", value);
+                            break;
+                        case 7:
+                            displayDeque(dq);
+                            break;
+                        case 8:
+                            goto endDeque; // Exit Deque operations
+                        default:
+                            printf("Invalid choice. Please try again.\n");
+                    }
+                }
+                endDeque:
+                break;
+            }
+
+            case 4:
+                printf("Exiting program...\n");
+                // Free allocated memory before exiting
+                // Note: For simplicity, memory deallocation is not handled here.
+                exit(0);
+
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
